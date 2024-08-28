@@ -33,10 +33,9 @@ jobs:
       - name: Install Docker (Linux only)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo systemctl start docker
-          sudo systemctl enable docker
+          curl -fsSL https://get.docker.com | sh
+          sudo usermod -aG docker $USER
+          newgrp docker
 
       - name: Set up Docker Buildx (macOS only)
         if: runner.os == 'macOS'
