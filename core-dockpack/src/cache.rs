@@ -32,3 +32,18 @@ pub fn wipe_and_create_cache(directory: &PathBuf) {
         "Failed to create nanoservices tar cache directory"
     );
 }
+
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn test_process_image_name() {
+        let image_name = "surrealdb/surrealcs-client:latest".to_string();
+        // let expected = "docker.io_library_alpine".to_string();
+        println!("{}", process_image_name(&image_name));
+    }
+
+}
