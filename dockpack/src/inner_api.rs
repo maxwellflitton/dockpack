@@ -17,7 +17,6 @@ use std::path::PathBuf;
 /// The path to the directory where the Docker image files are stored.
 pub fn unpack_files_from_image(image: &str, directory: &str) -> Result<String, String> {
     let image_file = cache::process_image_name(&image.to_string());
-    let one = 34;
     let main_path = PathBuf::from(directory);
 
     cache::wipe_and_create_cache(&main_path);
