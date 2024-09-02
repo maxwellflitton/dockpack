@@ -1,7 +1,6 @@
 use std::ffi::{CString, CStr};
 use std::os::raw::c_char;
-
-mod inner_api;
+use core_dockpack::cmd_processes::pull::unpack_files::unpack_files_from_image;
 
 
 /// Unpacks the files from a Docker image into a directory.
@@ -22,7 +21,7 @@ pub extern "C" fn unpack_files_from_image_c(
     let image = unsafe { CStr::from_ptr(image).to_string_lossy().into_owned() };
     let directory = unsafe { CStr::from_ptr(directory).to_string_lossy().into_owned() };
 
-    match inner_api::unpack_files_from_image(&image, &directory) {
+    match unpack_files_from_image(&image, &directory) {
         Ok(path) => {
             let c_string = CString::new(path).unwrap();
             c_string.into_raw() // Return the C string

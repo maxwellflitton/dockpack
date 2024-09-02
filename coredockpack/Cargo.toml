@@ -1,0 +1,11 @@
+[package]
+name = "coredockpack"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+core-dockpack = { path = "../core-dockpack" }
+
+
+[lib]
+crate-type = ["cdylib"]
