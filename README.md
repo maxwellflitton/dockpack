@@ -6,7 +6,7 @@ enabling you to use Docker to distribute files. Because Docker is integrated int
 every major cloud provider and CI/CD tool, and has caching and version control built-in,
 you can use Dockpack to package and distribute private code libraries of any language.
 You can also combine multiple projects and tools in different language into a single Docker 
-image for distribution. I've personally used this tool todistribute private Rust code
+image for distribution. I've personally used this tool to distribute private Rust code
 libraries, trained ML models, and private python packages. I've also used it to bundle
 multiple tools and scripts together to setup a build package for servers.
 
