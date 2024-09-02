@@ -56,18 +56,10 @@ We must add all the platforms to ensure that the image can be run on any archite
 run in the image, just files to unpack.
 
 ## Future features
-[] Add a `push` command to pack files into a Docker image
-[] Add a `ls` command to list all the unpacked images
-[] Add a `rm` command to remove unpacked images
-[] Add data store for tracking unpacked images and their locations
-[] Add an undate command to update downloaded images in their existing directories
-[] Add buckets for bundling multiple images together for distribution
-[] Dynamic C library so other languages can directly interact with core functionalities to build on top of it.
-
-
-## Structure of Repo
-The repo is structured as follows:
-
-- `core-dockpack`: The core Rust library that other Rust programs can use to directly use the core functionalities of Dockpack.
-- `coredockpack`: Wraps the `core-dockpack` library in a C interface for a dynamic C library so we can directly interact with the core functionalities of Dockpack from other languages.
-- `dockpack`: The CLI tool that uses the `core-dockpack` library to provide the user with the functionalities of Dockpack in the terminal.
+- [ ] Add a `push` command to pack files into a Docker image
+- [ ] Add a `ls` command to list all the unpacked images
+- [ ] Add a `rm` command to remove unpacked images
+- [ ] Add data store for tracking unpacked images and their locations
+- [ ] Add an update command to update downloaded images in their existing directories
+- [ ] Add buckets for bundling multiple images together for distribution
+- [ ] Dynamic C library so other languages can directly interact with core functionalities to build on top of it.
