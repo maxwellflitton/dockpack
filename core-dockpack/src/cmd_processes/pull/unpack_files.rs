@@ -1,5 +1,5 @@
 //! The API for unpacking Docker images into a directory.
-use core_dockpack::{
+use crate::utils::{
     docker_commands,
     cache,
     unpacking
@@ -16,10 +16,7 @@ use std::path::PathBuf;
 /// # Returns
 /// The path to the directory where the Docker image files are stored.
 pub fn unpack_files_from_image(image: &str, directory: &str) -> Result<String, String> {
-    let image_file = cache::process_image_name(&image.to_string());
-
     let main_path = PathBuf::from(directory);
-
     cache::wipe_and_create_cache(&main_path);
 
     let tar_dir = main_path.join("tar");
@@ -28,11 +25,29 @@ pub fn unpack_files_from_image(image: &str, directory: &str) -> Result<String, S
         image,
         tar_dir,
     )?;
-    let unpack_path  = main_path.join(image_file);
     let final_path = unpacking::extract_layers(
         main_tar_path.as_str(),
         // unwrap is safe here because we are using a hardcoded path
-        unpack_path.to_str().unwrap(),
+        main_path.to_str().unwrap(),
     )?;
     Ok(final_path)
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::path::Path;
+
+    #[test]
+    fn test_unpack_files_from_image() {
+        let image = "maxwellflitton/nan-one";
+        let directory = "./cache/two";
+        let result = unpack_files_from_image(image, directory);
+        assert!(result.is_ok());
+        let path = result.unwrap();
+        assert!(Path::new(&path).exists());
+        // fs::remove_dir_all(directory).unwrap();
+    }
 }

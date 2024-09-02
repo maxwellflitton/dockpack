@@ -1,18 +1,16 @@
 [package]
 name = "dockpack"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Maxwell Flitton maxwellflitton@gmail.com"]
 description = "Command line tool for unpacking files from Docker images"
 license = "MIT"
 
 [dependencies]
-core-dockpack = { version = "0.1.0" }
+# core-dockpack = { version = "0.1.0" }
+core-dockpack = { path = "../core-dockpack" }
 clap = { version = "4.0", features = ["derive"] }
 
 [[bin]]
 name = "dockpack"
 path = "src/main.rs"
-
-[lib]
-crate-type = ["cdylib"]
