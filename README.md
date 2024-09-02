@@ -62,7 +62,7 @@ run in the image, just files to unpack.
 [] Add data store for tracking unpacked images and their locations
 [] Add an undate command to update downloaded images in their existing directories
 [] Add buckets for bundling multiple images together for distribution
-[] Dynamic C library so other languages can directly interact with core functionalities to build on top of it
+[] Dynamic C library so other languages can directly interact with core functionalities to build on top of it.
 
 
 ## Structure of Repo
