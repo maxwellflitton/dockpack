@@ -1,6 +1,6 @@
 [package]
 name = "dockpack"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
@@ -11,10 +11,3 @@ clap = { version = "4.0", features = ["derive"] }
 [[bin]]
 name = "dockpack"
 path = "src/main.rs"
-
-[lib]
-crate-type = ["cdylib"]
-
-
-# [target.'cfg(bin)'.dependencies]
-# clap = { version = "4.0", features = ["derive"] }

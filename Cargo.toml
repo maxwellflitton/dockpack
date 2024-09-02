@@ -2,6 +2,6 @@
 [workspace]
 resolver = "2"
 members = [
-    "core-dockpack",
+    "core-dockpack", "coredockpack",
     "dockpack",
 ]
