@@ -53,7 +53,7 @@
 //! run in the image, just files to unpack.
 //! 
 //! ## Future features
-//! [] Add a `push` command to pack files into a Docker image
+//! [X] Add a `push` command to pack files into a Docker image
 //! [] Add a `ls` command to list all the unpacked images
 //! [] Add a `rm` command to remove unpacked images
 //! [] Add data store for tracking unpacked images and their locations
@@ -65,6 +65,7 @@ use clap::{Arg, Command};
 use core_dockpack::cmd_processes:: pull::unpack_files;
 use core_dockpack::cmd_processes::build::build_dockerfile;
 use core_dockpack::cmd_processes::push::execute_push;
+use core_dockpack::utils::docker_commands::build_docker_image;
 
 fn main() {      
     // Create the Clap command line app
@@ -120,17 +121,23 @@ fn main() {
             }
         }
         "build" => {
-            let directory = match matches.get_one::<String>("directory") {
-                Some(directory) => directory,
-                None => { 
-                    eprintln!("Directory argument is required for pull");
+            let current_dir = std::env::current_dir().expect("Failed to get current directory")
+                                                           .to_str()
+                                                           .expect("Failed to convert path to string").to_owned();
+            let image = match matches.get_one::<String>("image") {
+                Some(image) => image,
+                None => {
+                    eprintln!("Image argument is required for push");
                     return;
-            }
+                }
             };
-
-            match build_dockerfile::create_dockerfile(directory) {
-                Ok(()) => println!("Successfully built to: {}", directory),
+            match build_dockerfile::create_dockerfile(&current_dir) {
+                Ok(()) => {},
                 Err(e) => eprintln!("Error unpacking image: {}", e),
+            }
+            match build_docker_image(image) {
+                Ok(()) => println!("Successfully created docker image tagged: {}", image),
+                Err(e) => eprintln!("Error creating docker image: {}", e),
             }
         }
         
@@ -142,15 +149,7 @@ fn main() {
                     return;
                 }
             };
-            let directory = match matches.get_one::<String>("directory") {
-                Some(directory) => directory,
-                None => {
-                    eprintln!("Directory argument is required for push");
-                    return;
-                }
-            };
-
-            match execute_push::execute_docker_build(directory, image) {
+            match execute_push::execute_docker_build(image) {
                 Ok(()) => println!("Successfully created docker image"),
                 Err(e) => eprintln!("Error creating docker image: {}", e),
             }

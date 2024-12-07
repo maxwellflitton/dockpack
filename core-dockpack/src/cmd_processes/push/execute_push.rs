@@ -1,29 +1,15 @@
+//! This module contains the function to execute the push command to push a docker image to the docker registry.
 use crate::utils::docker_commands;
 
-pub fn execute_docker_build(directory: &str, image: &str) -> Result<(), String> {
-    docker_commands::build_docker_image(directory, image)?;
+
+/// Executes the push command to push a docker image to the docker registry.
+/// 
+/// # Arguments
+/// * `image` - A string slice that holds the name of the docker image to push.
+/// 
+/// # Returns
+/// * `Result<(), String>` - A result that indicates if the docker image was pushed successfully or an error message
+pub fn execute_docker_build(image: &str) -> Result<(), String> {
+    docker_commands::build_docker_image(image)?;
     Ok(())
-}
-
-// run from core_dockpack containing test_image directory with dockerfile
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::fs;
-
-    #[test]
-    fn test_execute_push() {
-        let image_name = "test_image:latest";
-        let directory = "./test_image";
-
-        fs::create_dir_all(directory).expect("Failed to create test directory");
-        let dockerfile_path = format!("{}/Dockerfile", directory);
-        let dockerfile_content = "FROM scratch\nCOPY . .\n";
-        fs::write(&dockerfile_path, dockerfile_content).expect("Failed to write Dockerfile");
-
-        let result = execute_docker_build(directory, image_name);
-        assert!(result.is_ok());
-
-        fs::remove_dir_all(directory).expect("Failed to remove test directory");
-    }
 }

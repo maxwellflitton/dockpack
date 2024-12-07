@@ -72,13 +72,19 @@ pub fn save_docker_image(image_name: &str, tar_path: &str) -> Result<String, Str
     })
 }
 
-// directory is the build context
 
-pub fn build_docker_image(directory: &str, image: &str) -> Result<(), String> {
+/// Builds a Docker image from a given build context directory.
+/// 
+/// # Arguments
+/// * `image` - A string slice that holds the name of the Docker image to build
+/// 
+/// # Returns
+/// * `Result<(), String>` - A result that indicates if the Docker image was built successfully or an error message
+pub fn build_docker_image(image: &str) -> Result<(), String> {
     let platforms = "linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/s390x,linux/ppc64le";
     let status = Command::new("docker")
     .args(["build", "--platform", platforms, "-t", image])
-    .arg(directory) // Add the directory as a separate argument
+    // .arg(directory) // Add the directory as a separate argument
     .status().map_err(|e| e.to_string())?;
 
     if status.success() {

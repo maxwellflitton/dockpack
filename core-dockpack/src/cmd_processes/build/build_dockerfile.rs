@@ -1,22 +1,22 @@
 //! Builds a Dockerfile from a directory
-
 use std::fs:: File;
 use std::io:: Write;
 
-// directory is the build context
 
+/// Creates a Dockerfile in the given directory
+/// 
+/// # Arguments
+/// * `directory` - A string slice that holds the path to the directory where the Dockerfile will be created
+/// 
+/// # Returns
+/// * `Result<(), String>` - A result that indicates if the Dockerfile was created successfully or an error message
 pub fn create_dockerfile(directory: &str) -> Result<(), String> {
-
     let docker_file_content = format! {
         "FROM scratch\nCOPY . .\n"
     }; 
-
     let dockerfile_path = format!("{}/Dockerfile", directory);
-
     let mut dockerfile = File::create(&dockerfile_path).map_err(|e| e.to_string())?;
-
     dockerfile.write_all(docker_file_content.as_bytes()).map_err(|e| e.to_string())?;
-    
     Ok(())
 }
 
