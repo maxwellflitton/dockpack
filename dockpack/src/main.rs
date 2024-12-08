@@ -131,14 +131,23 @@ fn main() {
                     return;
                 }
             };
-            match build_dockerfile::create_dockerfile(&current_dir) {
+            let uuid = uuid::Uuid::new_v4().to_string();
+            let full_path = std::path::Path::new(&current_dir).join(uuid).to_str().expect("Failed to convert path to string").to_owned();
+            match build_dockerfile::create_dockerfile(&full_path) {
                 Ok(()) => {},
                 Err(e) => eprintln!("Error unpacking image: {}", e),
             }
-            match build_docker_image(image) {
+            // match build_docker_image(image, &full_path) {
+            match build_docker_image(image, &full_path) {
                 Ok(()) => println!("Successfully created docker image tagged: {}", image),
-                Err(e) => eprintln!("Error creating docker image: {}", e),
+                Err(e) => {
+                    let file_path = std::path::Path::new(&current_dir).join("Dockerfile").to_str().expect("Failed to convert path to string").to_owned();
+                    std::fs::remove_file(file_path).expect("Failed to remove Dockerfile");
+                    eprintln!("Error creating docker image: {}", e);
+                },
             }
+            std::fs::remove_file(full_path).expect("Failed to remove Dockerfile");
+
         }
         
         "push" => {
@@ -149,10 +158,7 @@ fn main() {
                     return;
                 }
             };
-            match execute_push::execute_docker_build(image) {
-                Ok(()) => println!("Successfully created docker image"),
-                Err(e) => eprintln!("Error creating docker image: {}", e),
-            }
+            let _ = execute_push::execute_push_image(image);
         }
         "ls" => {
             // Placeholder for the ls command implementation

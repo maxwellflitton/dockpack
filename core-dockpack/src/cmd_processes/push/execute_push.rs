@@ -9,7 +9,7 @@ use crate::utils::docker_commands;
 /// 
 /// # Returns
 /// * `Result<(), String>` - A result that indicates if the docker image was pushed successfully or an error message
-pub fn execute_docker_build(image: &str) -> Result<(), String> {
-    docker_commands::build_docker_image(image)?;
+pub fn execute_push_image(image: &str) -> Result<(), String> {
+    docker_commands::push_docker_image(image)?;
     Ok(())
 }

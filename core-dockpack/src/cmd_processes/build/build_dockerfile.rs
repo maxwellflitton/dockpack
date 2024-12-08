@@ -14,8 +14,8 @@ pub fn create_dockerfile(directory: &str) -> Result<(), String> {
     let docker_file_content = format! {
         "FROM scratch\nCOPY . .\n"
     }; 
-    let dockerfile_path = format!("{}/Dockerfile", directory);
-    let mut dockerfile = File::create(&dockerfile_path).map_err(|e| e.to_string())?;
+    // let dockerfile_path = format!("{}/Dockerfile", directory);
+    let mut dockerfile = File::create(&directory).map_err(|e| e.to_string())?;
     dockerfile.write_all(docker_file_content.as_bytes()).map_err(|e| e.to_string())?;
     Ok(())
 }

@@ -25,6 +25,26 @@ pub fn pull_docker_image(image_name: &str) -> Result<(), String> {
 }
 
 
+/// Pushes a Docker image to the Docker registry.
+/// 
+/// # Arguments
+/// * `image_name` - The name of the Docker image to push.
+/// 
+/// # Returns
+/// A result indicating if the Docker image was pushed successfully or an error message
+pub fn push_docker_image(image_name: &str) -> Result<(), String> {
+    let status = Command::new("docker")
+        .args(["push", image_name])
+        .status().map_err(|e| e.to_string())?;
+
+    if status.success() {
+        Ok(())
+    } else {
+        Err("Failed to push Docker image".to_string())
+    }
+}
+
+
 /// Extracts the Tar file from the Docker image, and saves it to the specified path.
 ///
 /// # Notes
@@ -77,13 +97,14 @@ pub fn save_docker_image(image_name: &str, tar_path: &str) -> Result<String, Str
 /// 
 /// # Arguments
 /// * `image` - A string slice that holds the name of the Docker image to build
+/// * `file_path` - A string slice that holds the path to the Dockerfile
 /// 
 /// # Returns
 /// * `Result<(), String>` - A result that indicates if the Docker image was built successfully or an error message
-pub fn build_docker_image(image: &str) -> Result<(), String> {
+pub fn build_docker_image(image: &str, file_path: &str) -> Result<(), String> {
     let platforms = "linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/s390x,linux/ppc64le";
     let status = Command::new("docker")
-    .args(["build", "--platform", platforms, "-t", image])
+    .args(["build", "--platform", platforms, "-t", image, "-f", file_path, "."])
     // .arg(directory) // Add the directory as a separate argument
     .status().map_err(|e| e.to_string())?;
 
