@@ -38,25 +38,22 @@ This will give you the following file structure:
 ```
 
 ## Packing files into a Docker image
-I am working on a `push` command for later versions. However, for now, just use Docker and the `scratch` image.
-For instance, you can have the following `Dockerfile`:
-```Dockerfile
-FROM scratch
 
-COPY ./some_dir .
-```
-Then build the image with the following command:
+You can pack all files and subdirectories in the current working directory (except for anything in the `.dockerignore` file) into a Docker image with the following `build` command:
 ```bash
-docker build . \
---platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6,linux/s390x,linux/ppc64le \
--t <IMAGE_REPO> \
---push
+dockpack build -i <image>
 ```
-We must add all the platforms to ensure that the image can be run on any architecture as we don't have anything to
-run in the image, just files to unpack.
+
+We can then push the image to a Docker registry with the following `push` command:
+```bash
+dockpack push -i <image>
+```
+
+Though to be honest, a standard docker push will work just fine as you will see the packed files in you local images.
 
 ## Future features
-- [ ] Add a `push` command to pack files into a Docker image
+- [X] Add a `push` command to pack push
+- [X] Add a `build` command to pack files into a Docker image
 - [ ] Add a `ls` command to list all the unpacked images
 - [ ] Add a `rm` command to remove unpacked images
 - [ ] Add data store for tracking unpacked images and their locations

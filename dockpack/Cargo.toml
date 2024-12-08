@@ -1,14 +1,14 @@
 [package]
 name = "dockpack"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 authors = ["Maxwell Flitton maxwellflitton@gmail.com"]
 description = "Command line tool for unpacking files from Docker images"
 license = "MIT"
 
 [dependencies]
-# core-dockpack = { version = "0.1.2" }
-core-dockpack = { path = "../core-dockpack" }
+core-dockpack = { version = "0.1.3" }
+# core-dockpack = { path = "../core-dockpack" }
 clap = { version = "4.0", features = ["derive"] }
 uuid = { version = "1.11.0", features = ["v4"] }
 
