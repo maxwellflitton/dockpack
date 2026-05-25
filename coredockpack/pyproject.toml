@@ -1,0 +1,24 @@
+[build-system]
+requires = ["maturin>=1.8,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "dockpack_py"
+requires-python = ">=3.8"
+classifiers = [
+  "Programming Language :: Rust",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = [
+    "cffi",
+]
+dynamic = ["version"]
+
+[tool.maturin]
+bindings = "cffi"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+]

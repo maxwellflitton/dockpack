@@ -1,0 +1,5 @@
+build_py:
+  uv run maturin develop --uv
+
+test:
+  just build_py && uv run pytest
