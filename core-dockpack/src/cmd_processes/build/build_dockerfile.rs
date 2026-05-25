@@ -1,20 +1,27 @@
 //! Builds a Dockerfile from a directory
 
+use anyhow::{Context, Result};
 use std::fs::File;
 use std::io::Write;
 
 // directory is the build context
 
-pub fn create_dockerfile(directory: &str) -> Result<(), String> {
+pub fn create_dockerfile(directory: &str) -> Result<()> {
     let docker_file_content = "FROM scratch\nCOPY . .\n".to_string();
 
     let dockerfile_path = format!("{}/Dockerfile", directory);
 
-    let mut dockerfile = File::create(&dockerfile_path).map_err(|e| e.to_string())?;
+    let mut dockerfile = File::create(&dockerfile_path)
+        .with_context(|| format!("Error creatining file at path {}", dockerfile_path))?;
 
     dockerfile
         .write_all(docker_file_content.as_bytes())
-        .map_err(|e| e.to_string())?;
+        .with_context(|| {
+            format!(
+                "Could not write all from scratch content to dockerfile at path {}",
+                dockerfile_path,
+            )
+        })?;
 
     Ok(())
 }

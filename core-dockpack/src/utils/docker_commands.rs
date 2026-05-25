@@ -1,27 +1,28 @@
 //! Defines the actions around downloading and unpacking docker images to access the files.
 use super::cache::process_image_name;
-use bollard::image::CreateImageOptions;
+use anyhow::{anyhow, Context, Result};
+use bollard::query_parameters::CreateImageOptionsBuilder;
 use bollard::Docker;
 use futures_util::stream::TryStreamExt;
 use futures_util::StreamExt;
-use std::default::Default;
 use std::process::Command;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
 use tokio_tar::Archive;
 
-async fn pull_image(image_name: &str, docker: &Docker) -> Result<(), String> {
-    let options = Some(CreateImageOptions {
-        from_image: image_name,
-        ..Default::default()
-    });
+async fn pull_image(image_name: &str, docker: &Docker) -> Result<()> {
+    let options = Some(
+        CreateImageOptionsBuilder::new()
+            .from_image(image_name)
+            .build(),
+    );
     println!("image_name: {}", image_name);
     // confirmed: this works
     docker
         .create_image(options, None, None)
         .try_collect::<Vec<_>>()
         .await
-        .map_err(|err| err.to_string())?;
+        .with_context(|| "Error creating image")?;
     Ok(())
 }
 
@@ -36,7 +37,7 @@ async fn pull_image(image_name: &str, docker: &Docker) -> Result<(), String> {
 ///
 /// # Returns
 /// The path to where the compressed Docker image files are stored
-pub async fn save_docker_image(image_name: &str, tar_path: &str) -> Result<String, String> {
+pub async fn save_docker_image(image_name: &str, tar_path: &str) -> Result<String> {
     // pull image
     // // TODO: consider moving to receive in the function
     let docker = Docker::connect_with_socket_defaults()
@@ -56,17 +57,17 @@ pub async fn save_docker_image(image_name: &str, tar_path: &str) -> Result<Strin
     let mut tar = docker.export_image(image_name);
     let mut archive_file = File::create(file_path)
         .await
-        .map_err(|err| err.to_string())?;
+        .with_context(|| "Could not create file path for tar file")?;
     while let Some(chunk) = tar.next().await {
-        let data = chunk.map_err(|err| err.to_string())?;
+        let data = chunk.with_context(|| "Could not read bytes from zip stream")?;
         archive_file
             .write_all(&data)
             .await
-            .map_err(|err| err.to_string())?;
+            .with_context(|| "Error writing bytes to file")?;
         archive_file
             .sync_all()
             .await
-            .map_err(|err| err.to_string())?;
+            .with_context(|| "Error syncing all data to file")?;
     }
     println!("Synced to tar file");
 
@@ -75,12 +76,15 @@ pub async fn save_docker_image(image_name: &str, tar_path: &str) -> Result<Strin
         .expect("Could not reopen archive file");
     let mut archive = Archive::new(file);
 
-    archive.unpack(tar_path).await.map_err(|e| e.to_string())?;
+    archive
+        .unpack(tar_path)
+        .await
+        .with_context(|| "Error unpacking tar file")?;
     //
     // // return statement
     Ok(match tar_path.to_str() {
         Some(v) => v.to_string(),
-        None => return Err("Failed to convert path to string".to_string()),
+        None => return Err(anyhow!("Failed to convert path to string")),
     })
 }
 

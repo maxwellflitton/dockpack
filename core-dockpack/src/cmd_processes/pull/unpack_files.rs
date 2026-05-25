@@ -1,5 +1,6 @@
 //! The API for unpacking Docker images into a directory.
 use crate::utils::{cache, docker_commands, unpacking};
+use anyhow::Result;
 use std::path::PathBuf;
 
 /// Unpacks the files from a Docker image into a directory.
@@ -10,7 +11,7 @@ use std::path::PathBuf;
 ///
 /// # Returns
 /// The path to the directory where the Docker image files are stored.
-pub async fn unpack_files_from_image(image: &str, directory: &str) -> Result<String, String> {
+pub async fn unpack_files_from_image(image: &str, directory: &str) -> Result<String> {
     let main_path = PathBuf::from(directory);
     cache::wipe_and_create_cache(&main_path);
 
@@ -46,6 +47,6 @@ mod tests {
         assert!(result.is_ok());
         let path = result.unwrap();
         assert!(Path::new(&path).exists());
-        // fs::remove_dir_all(directory).unwrap();
+        fs::remove_dir_all(directory).unwrap();
     }
 }

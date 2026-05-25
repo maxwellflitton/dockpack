@@ -1,4 +1,5 @@
 //! Defines the actions around unpacking compressed Docker files from the manifest.
+use anyhow::{anyhow, Context, Result};
 use flate2::read::GzDecoder;
 use serde_json::Value;
 use std::fs::File;
@@ -48,16 +49,17 @@ fn read_json_file<P: AsRef<Path>>(path: P) -> std::io::Result<Value> {
 ///
 /// # Returns
 /// The path to where the layers are extracted.
-pub fn extract_layers(main_path: &str, unpack_path: &str) -> Result<String, String> {
+pub fn extract_layers(main_path: &str, unpack_path: &str) -> Result<String> {
     let manifest_path = std::path::Path::new(main_path).join("manifest.json");
     let blobs_dir = std::path::Path::new(main_path);
     let unpack_path = std::path::Path::new(unpack_path);
 
     if !unpack_path.exists() {
-        std::fs::create_dir_all(unpack_path).map_err(|e| e.to_string())?;
+        std::fs::create_dir_all(unpack_path).with_context(|| "Error creating directory")?;
     }
 
-    let manifest = read_json_file(&manifest_path).map_err(|e| e.to_string())?;
+    let manifest =
+        read_json_file(&manifest_path).with_context(|| "Error reading json manifest file")?;
 
     if let Some(layers) = manifest[0]["Layers"].as_array() {
         println!("Found {} layers in manifest", layers.len());
@@ -70,25 +72,26 @@ pub fn extract_layers(main_path: &str, unpack_path: &str) -> Result<String, Stri
                     Some(layer) => layer,
                     None => {
                         return Err(
-                            "Failed to get the layer path when extracting a layer from the Docker image".to_string()
+                            anyhow!("Failed to get the layer path when extracting a layer from the Docker image")
                         );
                 }
             });
 
             // Extract the layer's tarball to a directory
-            let mut tar_file = File::open(&layer_path).map_err(|e| e.to_string())?;
-            let if_gzipped = check_if_gzipped(&mut tar_file).map_err(|e| e.to_string())?;
+            let mut tar_file = File::open(&layer_path).with_context(|| "Error reading tar file")?;
+            let if_gzipped = check_if_gzipped(&mut tar_file)
+                .with_context(|| "Error checking if tar fle is gzipped")?;
             match if_gzipped {
                 true => {
                     println!("Layer is gzipped");
                     let decompressed = GzDecoder::new(tar_file);
                     let mut archive = Archive::new(decompressed);
-                    archive.unpack(unpack_path).map_err(|e| e.to_string())?;
+                    archive.unpack(unpack_path)?;
                 }
                 false => {
                     println!("Layer is not gzipped");
                     let mut archive = Archive::new(tar_file);
-                    archive.unpack(unpack_path).map_err(|e| e.to_string())?;
+                    archive.unpack(unpack_path)?;
                 }
             }
         }
@@ -99,10 +102,9 @@ pub fn extract_layers(main_path: &str, unpack_path: &str) -> Result<String, Stri
     Ok(match unpack_path.to_str() {
         Some(v) => v.to_string(),
         None => {
-            return Err(
+            return Err(anyhow!(
                 "Failed to convert path to string when extracting layers from the Docker image"
-                    .to_string(),
-            );
+            ));
         }
     })
 }

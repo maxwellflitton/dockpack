@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 core-dockpack = { path = "../core-dockpack" }
+tokio = "1.45.1"
 
 
 [lib]
